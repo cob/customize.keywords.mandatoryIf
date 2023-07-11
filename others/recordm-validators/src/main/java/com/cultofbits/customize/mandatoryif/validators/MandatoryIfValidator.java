@@ -73,7 +73,7 @@ public class MandatoryIfValidator extends AbstractOnCreateValidator implements O
                     errors.add(standard(instanceField, ErrorType.MANDATORY));
                 }
             } catch (Exception e) {
-                errors.add(custom(instanceField, "Error validating mandatory expression: " + mandatoryArg));
+                errors.add(custom(instanceField, "Error evaluating mandatoryIf expression: " + mandatoryArg));
             }
 
             if (instanceField.children.size() > 0) {
