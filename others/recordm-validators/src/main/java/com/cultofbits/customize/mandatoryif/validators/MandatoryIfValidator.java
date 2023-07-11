@@ -13,6 +13,7 @@ import com.google.common.cache.LoadingCache;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -63,17 +64,13 @@ public class MandatoryIfValidator extends AbstractOnCreateValidator implements O
                 continue;
 
             FieldKeyArguments keywordArgs = instanceField.fieldDefinition.argsFor(KEYWORD);
-            String mandatoryArg = !(keywordArgs instanceof FieldKeyArguments.None) ? keywordArgs.get().get(0) : "";
+            List<String> expressions = !(keywordArgs instanceof FieldKeyArguments.None) ? keywordArgs.get() : Collections.emptyList();
 
-            //noinspection UnstableApiUsage
-            Expr expr = EXPRESSION_CACHE_BUILDER.getUnchecked(mandatoryArg);
+            if (expressions.isEmpty() && instanceField.getValue() == null) {
+                errors.add(standard(instanceField, ErrorType.MANDATORY));
 
-            try {
-                if (expr.fieldName == null || expr.isTrue(instanceField.getClosest(expr.fieldName))) {
-                    errors.add(standard(instanceField, ErrorType.MANDATORY));
-                }
-            } catch (Exception e) {
-                errors.add(custom(instanceField, "Error evaluating mandatoryIf expression: " + mandatoryArg));
+            } else {
+                evaluateAsAND(instanceField, expressions, errors);
             }
 
             if (instanceField.children.size() > 0) {
@@ -82,6 +79,27 @@ public class MandatoryIfValidator extends AbstractOnCreateValidator implements O
         }
 
         return errors;
+    }
+
+    protected void evaluateAsAND(InstanceField instanceField, List<String> expressions, List<ValidationError> errors) {
+        boolean isError = true;
+
+        for (String mandatoryExpression : expressions) {
+            //noinspection UnstableApiUsage
+            Expr expr = EXPRESSION_CACHE_BUILDER.getUnchecked(mandatoryExpression);
+
+            try {
+                isError = expr.isTrue(instanceField.getClosest(expr.fieldName)) && isError;
+            } catch (Exception e) {
+                errors.add(custom(instanceField, "Error evaluating mandatoryIf expression: " + mandatoryExpression));
+                break;
+            }
+        }
+
+        if (isError) {
+            errors.add(standard(instanceField, ErrorType.MANDATORY));
+        }
+
     }
 
     protected static Expr buildExpression(String arg) {

@@ -22,35 +22,35 @@ public class MandatoryIfValidatorTest {
     @Test
     public void can_build_expressions() {
         assertEquals(MandatoryIfValidator.buildExpression(null),
-                     new MandatoryIfValidator.Expr());
+                new MandatoryIfValidator.Expr());
 
         assertEquals(MandatoryIfValidator.buildExpression(""),
-                     new MandatoryIfValidator.Expr());
+                new MandatoryIfValidator.Expr());
 
         assertEquals(MandatoryIfValidator.buildExpression("     "),
-                     new MandatoryIfValidator.Expr());
+                new MandatoryIfValidator.Expr());
 
         assertEquals(MandatoryIfValidator.buildExpression("akjbdf % akjfcb"),
-                     new MandatoryIfValidator.Expr("akjbdf % akjfcb", null, null));
+                new MandatoryIfValidator.Expr("akjbdf % akjfcb", null, null));
 
         assertEquals(MandatoryIfValidator.buildExpression("field name"),
-                     new MandatoryIfValidator.Expr("field name", null, null));
+                new MandatoryIfValidator.Expr("field name", null, null));
 
         assertEquals(MandatoryIfValidator.buildExpression("field name = test"),
-                     new MandatoryIfValidator.Expr("field name", "=", "test"));
+                new MandatoryIfValidator.Expr("field name", "=", "test"));
 
         assertEquals(MandatoryIfValidator.buildExpression("field!="),
-                     new MandatoryIfValidator.Expr("field", "!=", null));
+                new MandatoryIfValidator.Expr("field", "!=", null));
 
         assertEquals(MandatoryIfValidator.buildExpression("field=1"),
-                     new MandatoryIfValidator.Expr("field", "=", "1"));
+                new MandatoryIfValidator.Expr("field", "=", "1"));
     }
 
     @Test
     public void pass_validation_if_condition_fails() {
         Instance instance = anInstance(
-            aField("User Type", "$[Robot,User]", "Robot"),
-            aField("Address", "$mandatoryIf(User Type=User)", null));
+                aField("User Type", "$[Robot,User]", "Robot"),
+                aField("Address", "$mandatoryIf(User Type=User)", null));
 
         assertTrue(validator.validateInstanceFields(instance.getFields()).isEmpty());
     }
@@ -58,8 +58,8 @@ public class MandatoryIfValidatorTest {
     @Test
     public void pass_validation_if_field_is_not_empty() {
         Instance instance = anInstance(
-            aField("User Type", "$[Robot,User]", "Robot"),
-            aField("Address", "$mandatoryIf(User Type=)", null));
+                aField("User Type", "$[Robot,User]", "Robot"),
+                aField("Address", "$mandatoryIf(User Type=)", null));
 
         assertTrue(validator.validateInstanceFields(instance.getFields()).isEmpty());
     }
@@ -67,8 +67,8 @@ public class MandatoryIfValidatorTest {
     @Test
     public void pass_validation_if_condition_true_and_field_has_value() {
         Instance instance = anInstance(
-            aField("User Type", "$[Robot,User]", "User"),
-            aField("Address", "$mandatoryIf(User Type=User)", "an address"));
+                aField("User Type", "$[Robot,User]", "User"),
+                aField("Address", "$mandatoryIf(User Type=User)", "an address"));
 
         assertTrue(validator.validateInstanceFields(instance.getFields()).isEmpty());
     }
@@ -76,8 +76,8 @@ public class MandatoryIfValidatorTest {
     @Test
     public void fail_validation_when_condition_is_true() {
         Instance instance = anInstance(
-            aField("User Type", "$[Robot,User]", "User"),
-            aField("Address", "$mandatoryIf(User Type=User)", null));
+                aField("User Type", "$[Robot,User]", "User"),
+                aField("Address", "$mandatoryIf(User Type=User)", null));
 
         assertTrue(validator.validateInstanceFields(instance.getFields()).size() > 0);
     }
@@ -85,8 +85,8 @@ public class MandatoryIfValidatorTest {
     @Test
     public void fail_validation_when_target_field_is_not_empty() {
         Instance instance = anInstance(
-            aField("User Type", "$[Robot,User]", "User"),
-            aField("Address", "$mandatoryIf(User Type!=)", null));
+                aField("User Type", "$[Robot,User]", "User"),
+                aField("Address", "$mandatoryIf(User Type!=)", null));
 
         assertTrue(validator.validateInstanceFields(instance.getFields()).size() > 0);
     }
@@ -94,7 +94,7 @@ public class MandatoryIfValidatorTest {
     @Test
     public void fail_validation_if_no_condition_and_value_is_null() {
         Instance instance = anInstance(
-            aField("Address", "$mandatoryIf", null));
+                aField("Address", "$mandatoryIf", null));
 
         assertTrue(validator.validateInstanceFields(instance.getFields()).size() > 0);
     }
@@ -102,8 +102,8 @@ public class MandatoryIfValidatorTest {
     @Test
     public void fail_validation_if_range_condition_is_false() {
         Instance instance = anInstance(
-            aField("Distance", "$number", "0"),
-            aField("Message", "$mandatoryIf(Distance > 10)", null));
+                aField("Distance", "$number", "0"),
+                aField("Message", "$mandatoryIf(Distance > 10)", null));
 
         assertTrue(validator.validateInstanceFields(instance.getFields()).isEmpty());
     }
@@ -111,8 +111,8 @@ public class MandatoryIfValidatorTest {
     @Test
     public void fail_validation_if_range_condition_is_true() {
         Instance instance = anInstance(
-            aField("Distance", "$number", "0"),
-            aField("Message", "$mandatoryIf(Distance < 10)", null));
+                aField("Distance", "$number", "0"),
+                aField("Message", "$mandatoryIf(Distance < 10)", null));
 
         assertTrue(validator.validateInstanceFields(instance.getFields()).size() > 0);
     }
@@ -120,8 +120,8 @@ public class MandatoryIfValidatorTest {
     @Test
     public void pass_validation_if_not_greater_than() {
         Instance instance = anInstance(
-            aField("Number", "$[1,2,3,4,5]", null),
-            aField("Message", "$mandatoryIf(Number < 2)", null));
+                aField("Number", "$[1,2,3,4,5]", null),
+                aField("Message", "$mandatoryIf(Number < 2)", null));
 
         assertTrue(validator.validateInstanceFields(instance.getFields()).isEmpty());
     }
@@ -148,7 +148,6 @@ public class MandatoryIfValidatorTest {
         parentField.children = Arrays.asList(usernameField, addressField);
 
         Instance instance = anInstance(parentField, usernameField, addressField);
-
         assertTrue(validator.validateInstanceFields(instance.getFields()).size() > 0);
     }
 
@@ -176,17 +175,36 @@ public class MandatoryIfValidatorTest {
         assertTrue(validator.validateInstanceFields(instance.getFields()).isEmpty());
     }
 
+    public void fail_validation_with_multiple_expressions_working_as_AND() {
+        Instance instance = anInstance(
+                aField("Number", "$[1,2,3,4,5]", "1"),
+                aField("Value", "$[A,B,C]", "A"),
+                aField("Message", "$mandatoryIf(Number < 2,Value = A)", null));
+
+        assertTrue(validator.validateInstanceFields(instance.getFields()).size() > 0);
+    }
+
+    @Test
+    public void fail_validation_with_multiple_expressions_working_as_OR() {
+        Instance instance = anInstance(
+                aField("Number", "$[1,2,3,4,5]", "4"),
+                aField("Value", "$[A,B,C]", "A"),
+                aField("Message", "$mandatoryIf(Number < 2) $mandatoryIf(Value = A)", null));
+
+        assertTrue(validator.validateInstanceFields(instance.getFields()).size() > 0);
+    }
+
     public static Instance anInstance(InstanceField... fields) {
         Instance instance = new Instance();
         instance.definition = new Definition(1, "A Definition");
 
         instance.fields = Arrays.asList(fields);
         instance.definition.setFieldDefinitions(new ArrayList<>(
-            instance.fields.stream()
-                .peek(f -> f.instance = instance)
-                .map(f -> f.fieldDefinition)
-                .peek(fd -> fd.definition = instance.definition)
-                .collect(Collectors.toSet())
+                instance.fields.stream()
+                        .peek(f -> f.instance = instance)
+                        .map(f -> f.fieldDefinition)
+                        .peek(fd -> fd.definition = instance.definition)
+                        .collect(Collectors.toSet())
         ));
 
         return instance;
